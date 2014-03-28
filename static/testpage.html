@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Learner Profile Test</title>
+		<script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
+		<style>
+
+			textarea#saveBody {
+				display: block;
+				width: 300px;
+				height: 100px;
+				margin-top: 10px;
+				margin-bottom: 10px;
+			}
+
+			p#getOutput {
+				border: solid lightgrey 1px;
+				width: 300px;
+				height: 100px;
+			}
+
+		</style>
+		<script>
+
+			function getProfile(form)
+			{
+				var id = $('#getId',form).val();
+				$.ajax({
+					'url': '/profile?id='+id,
+					'type': 'GET',
+					'dataType': 'json',
+					'success': function(data,status,xhr){
+						$('#getOutput').html(data);
+					}
+				});
+
+
+				return false;
+			}
+
+			function saveProfile(form)
+			{
+				var id = $('#saveId',form).val();
+				var body = $('#saveBody',form).val();
+				$.ajax({
+					'url': '/profile?id='+id,
+					'type': 'POST',
+					'contentType': 'application/json',
+					'data': body,
+					'processData': false,
+					'success': function(data,status,xhr){
+						$('#saveOutput').html(status);
+					}
+				});
+
+				return false;
+			}
+
+		</script>
+	</head>
+	<body>
+		<h1>Learner Profile Test Page</h1>
+
+		<h2>Get Profile</h2>
+		<form onsubmit="return getProfile(this)">
+			<label>Identifier: 
+				<input type="text" name="getId"></input>
+			</label>
+			<input type="submit" value="Submit"/>
+		</form>
+		<p id="getOutput"></p>
+
+		<h2>Save Profile</h2>
+		<form onsubmit="return saveProfile(this)">
+			<label>Identifier: 
+				<input type="text" name="saveId"/>
+			</label>
+			<textarea id="saveBody" name="saveBody" placeholder="Profile body goes here"></textarea>
+			<input type="submit" value="Submit"/>
+		</form>
+		<p id="saveOutput"></p>
+	</body>
+</html>

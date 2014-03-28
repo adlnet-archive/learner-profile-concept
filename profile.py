@@ -11,8 +11,11 @@ db = {}
 def saveProfile(request):
 	'''If authorized, update learner profile with request body'''
 
-	db[request.params['id']] = request.json
-	return Response(status=200)
+	try:
+		db[request.params['id']] = request.json
+		return Response(status=200, json=request.json)
+	except ValueError:
+		return Response(status=304, body='Body is not JSON')
 
 
 def getProfile(request):

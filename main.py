@@ -17,6 +17,8 @@ def main(args):
 	config.add_view(profile.getProfile, route_name='getProfile')
 	config.add_view(profile.saveProfile, route_name='saveProfile')
 
+	config.add_static_view('static', 'static/')
+
 	app = config.make_wsgi_app()
 	server = make_server('0.0.0.0', 8080, app)
 
