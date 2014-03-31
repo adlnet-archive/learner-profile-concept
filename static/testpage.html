@@ -30,7 +30,7 @@
 					'type': 'GET',
 					'dataType': 'json',
 					'success': function(data,status,xhr){
-						$('#getOutput').html(data);
+						$('#getOutput').text(JSON.stringify(data));
 					}
 				});
 
@@ -64,7 +64,7 @@
 		<h2>Get Profile</h2>
 		<form onsubmit="return getProfile(this)">
 			<label>Identifier: 
-				<input type="text" name="getId"></input>
+				<input type="text" id="getId" name="getId"></input>
 			</label>
 			<input type="submit" value="Submit"/>
 		</form>
@@ -73,7 +73,7 @@
 		<h2>Save Profile</h2>
 		<form onsubmit="return saveProfile(this)">
 			<label>Identifier: 
-				<input type="text" name="saveId"/>
+				<input type="text" id="saveId" name="saveId"/>
 			</label>
 			<textarea id="saveBody" name="saveBody" placeholder="Profile body goes here"></textarea>
 			<input type="submit" value="Submit"/>
