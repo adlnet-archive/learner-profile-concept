@@ -1,3 +1,4 @@
-# Learner Profile Prototype
+Learner Profile Concept
+=======================
 
-Provide CRUD services and validation for learner competency information
+Prototype to provide CRUD services and validation for learner competency information
