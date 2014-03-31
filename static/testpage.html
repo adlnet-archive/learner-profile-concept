@@ -31,6 +31,9 @@
 					'dataType': 'json',
 					'success': function(data,status,xhr){
 						$('#getOutput').text(JSON.stringify(data));
+					},
+					'error': function(xhr,status,err){
+						$('#getOutput').text(status);
 					}
 				});
 
