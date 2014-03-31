@@ -4,25 +4,30 @@
 
 from pyramid.response import Response
 import json
+import riak
 
-db = {}
+client = riak.RiakClient(pb_port=8087, protocol='pbc')
+db = client.bucket('profiles')
 
 
 def saveProfile(request):
 	'''If authorized, update learner profile with request body'''
 
+	key = db.get(request.params['id'])
 	try:
-		db[request.params['id']] = request.json
-		return Response(status=200, json=request.json)
+		key.data = request.json
+		key.store()
+		return Response(status=200)
+
 	except ValueError:
-		return Response(status=304, body='Body is not JSON')
+		return Response(status=304, body='Body is not JSON')	
 
 
 def getProfile(request):
 	'''If authorized, respond with learner profile from db'''
 
-	# check for presence of profile
-	if request.params['id'] not in db:
+	key = db.get(request.params['id'])
+	if key.data == None:
 		return Response(status=404)
 	else:
-		return Response(json=db[request.params['id']])
+		return Response(status=200, json=key.data)
