@@ -17,11 +17,12 @@ def saveProfile(request):
 	try:
 		key.data = request.json
 		key.store()
-		return Response(status=200)
+		return Response(status=200, json=key.data)
 
 	except ValueError:
 		return Response(status=304, body='Body is not JSON')	
-
+	except e:
+		return Response(status=500, body=e)
 
 def getProfile(request):
 	'''If authorized, respond with learner profile from db'''
