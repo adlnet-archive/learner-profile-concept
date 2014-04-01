@@ -5,82 +5,65 @@
 		<script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
 		<style>
 
-			textarea#saveBody {
+			textarea#body {
 				display: block;
-				width: 300px;
-				height: 100px;
+				width: 600px;
+				height: 400px;
 				margin-top: 10px;
 				margin-bottom: 10px;
-			}
-
-			p#getOutput {
-				border: solid lightgrey 1px;
-				width: 300px;
-				height: 100px;
 			}
 
 		</style>
 		<script>
 
-			function getProfile(form)
+			$(document).ready(function()
 			{
-				var id = $('#getId',form).val();
-				$.ajax({
-					'url': '/profile?id='+id,
-					'type': 'GET',
-					'dataType': 'json',
-					'success': function(data,status,xhr){
-						$('#getOutput').text(JSON.stringify(data));
-					},
-					'error': function(xhr,status,err){
-						$('#getOutput').text(status);
-					}
+				$('#pull').click(function(){
+					var id = $('#serverId').val();
+					$.ajax({
+						'url': '/profile?id='+id,
+						'type': 'GET',
+						'dataType': 'json',
+						'success': function(data,status,xhr){
+							$('#body').text(JSON.stringify(data,null,'    '));
+						},
+						'error': function(xhr,status,err){
+							$('#body').text('');
+						}
+					});
 				});
 
-
-				return false;
-			}
-
-			function saveProfile(form)
-			{
-				var id = $('#saveId',form).val();
-				var body = $('#saveBody',form).val();
-				$.ajax({
-					'url': '/profile?id='+id,
-					'type': 'POST',
-					'contentType': 'application/json',
-					'data': body,
-					'processData': false,
-					'success': function(data,status,xhr){
-						$('#saveOutput').html(status);
-					}
+				$('#push').click(function(){
+					var id = $('#serverId').val();
+					var body = $('#body').val();
+					$.ajax({
+						'url': '/profile?id='+id,
+						'type': 'POST',
+						'contentType': 'application/json',
+						'data': body,
+						'processData': false,
+						'success': function(data,status,xhr){
+							$('#body').text(JSON.stringify(data,null,'    '));
+						},
+						'error': function(xhr,status,err){
+							$('#body').text(status);
+						}
+					});
+	
 				});
-
-				return false;
-			}
+			});
 
 		</script>
 	</head>
 	<body>
 		<h1>Learner Profile Test Page</h1>
 
-		<h2>Get Profile</h2>
-		<form onsubmit="return getProfile(this)">
-			<label>Identifier: 
-				<input type="text" id="getId" name="getId"></input>
-			</label>
-			<input type="submit" value="Submit"/>
-		</form>
-		<p id="getOutput"></p>
+		<label>Identifier: 
+			<input type="text" id="serverId"></input>
+		</label>
+		<input type="button" id="pull" value="Pull"/>
+		<input type="button" id="push" value="Push"/>
+		<textarea id="body" placeholder="Profile body goes here"></textarea>
 
-		<h2>Save Profile</h2>
-		<form onsubmit="return saveProfile(this)">
-			<label>Identifier: 
-				<input type="text" id="saveId" name="saveId"/>
-			</label>
-			<textarea id="saveBody" name="saveBody" placeholder="Profile body goes here"></textarea>
-			<input type="submit" value="Submit"/>
-		</form>
-		<p id="saveOutput"></p>
 	</body>
 </html>
