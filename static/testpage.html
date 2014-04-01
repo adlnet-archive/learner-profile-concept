@@ -25,10 +25,12 @@
 						'type': 'GET',
 						'dataType': 'json',
 						'success': function(data,status,xhr){
-							$('#body').text(JSON.stringify(data,null,'    '));
+							console.log('Pull successful');
+							$('#body').val(JSON.stringify(data,null,'    '));
 						},
 						'error': function(xhr,status,err){
-							$('#body').text('');
+							console.log('Pull failed');
+							$('#body').val('');
 						}
 					});
 				});
@@ -43,13 +45,30 @@
 						'data': body,
 						'processData': false,
 						'success': function(data,status,xhr){
-							$('#body').text(JSON.stringify(data,null,'    '));
+							console.log('Push successful');
+							$('#body').val(JSON.stringify(data,null,'    '));
 						},
 						'error': function(xhr,status,err){
-							$('#body').text(status);
+							console.log('Push failed');
+							$('#body').val(status);
 						}
 					});
 	
+				});
+
+				$('#delete').click(function(){
+					var id = $('#serverId').val();
+					$.ajax({
+						'url': '/profile?id='+id,
+						'type': 'DELETE',
+						'success': function(data,status,xhr){
+							console.log('Delete successful');
+							$('#body').val('');
+						},
+						'error': function(xhr,status,err){
+							console.log('Delete failed');
+						}
+					});
 				});
 			});
 
@@ -63,6 +82,7 @@
 		</label>
 		<input type="button" id="pull" value="Pull"/>
 		<input type="button" id="push" value="Push"/>
+		<input type="button" id="delete" value="Delete"/>
 		<textarea id="body" placeholder="Profile body goes here"></textarea>
 
 	</body>

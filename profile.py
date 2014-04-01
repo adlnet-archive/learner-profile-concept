@@ -32,12 +32,12 @@ def saveProfile(request):
 	'''If authorized, update learner profile with request body'''
 
 	key = db.get(request.params['id'])
-	data = None
+	added = not key.exists
+	data = request.body
 	try:
 		data = request.json
 	except ValueError:
 		return Response(status=304, body='Body is not JSON')	
-
 
 	if request.method == 'POST':
 		try:
@@ -48,7 +48,10 @@ def saveProfile(request):
 		key.data = data
 
 	key.store()
-	return Response(status=200, json=key.data)
+	if added:
+		return Response(status=201, json=key.data)
+	else:
+		return Response(status=200, json=key.data)
 
 
 def deleteProfile(request):
@@ -57,6 +60,6 @@ def deleteProfile(request):
 	key = db.get(request.params['id'])
 	if key.exists:
 		key.delete()
-		return Response(status=200)
+		return Response(status=204)
 	else:
 		return Response(status=404)

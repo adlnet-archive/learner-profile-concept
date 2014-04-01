@@ -15,7 +15,7 @@ def mergeObjects(old, new):
 				# key is not in old, create
 				old[key] = new[key]
 
-		return old
+		return old if old != None else new
 
 	# new and old are not mergable, so new is the updated value
 	except (TypeError, AttributeError):

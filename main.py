@@ -17,7 +17,7 @@ def main(args):
 
 	config.add_view(profile.getProfile, route_name='getProfile')
 	config.add_view(profile.saveProfile, route_name='saveProfile')
-	config.add_view(profile.saveProfile, route_name='deleteProfile')
+	config.add_view(profile.deleteProfile, route_name='deleteProfile')
 
 	config.add_static_view('static', 'static/')
 
