@@ -72,8 +72,8 @@ def saveProfile(request):
 	# if the preconditions pass
 	if if_match in ['*', oldHash] and if_none_match not in ['*', oldHash]:
 
-		# merge objects on POST
-		if request.method == 'POST':
+		# merge objects on PUT
+		if request.method == 'PUT':
 			try:
 				if key.exists:
 					oldData = key.data
@@ -84,7 +84,7 @@ def saveProfile(request):
 			except:
 				return Response(status=500, body='Failed to merge objects')
 
-		# replace object on PUT
+		# replace object on POST
 		else:
 			key.data = data
 

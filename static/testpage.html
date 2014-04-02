@@ -50,7 +50,7 @@
 					var body = $('#body').val();
 					$.ajax({
 						'url': '/learner/'+id,
-						'type': 'POST',
+						'type': 'PUT',
 						'contentType': 'application/json',
 						'data': body,
 						'processData': false,
@@ -97,7 +97,7 @@
 			<input type="text" id="serverId"></input>
 		</label>
 		<input type="button" id="pull" value="GET"/>
-		<input type="button" id="push" value="POST"/>
+		<input type="button" id="push" value="PUT"/>
 		<input type="button" id="delete" value="DELETE"/>
 		<textarea id="body" placeholder="Profile body goes here"></textarea>
 
