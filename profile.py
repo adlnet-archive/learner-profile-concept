@@ -3,12 +3,22 @@
 #
 
 from pyramid.response import Response
-import util, json, riak
+import util, json, riak, copy
 import hashlib, base64
-from webob import etag
 
 client = riak.RiakClient(pb_port=8087, protocol='pbc')
 db = client.bucket('profiles')
+
+profileSkeleton = {
+	'identity': {
+		'key': None
+	},
+	'badges': {
+		'desired': [],
+		'inProgress': [],
+		'achieved': []
+	}
+}
 
 
 def getProfile(request):
@@ -65,7 +75,12 @@ def saveProfile(request):
 		# merge objects on POST
 		if request.method == 'POST':
 			try:
-				key.data = util.mergeObjects(key.data, data)
+				if key.exists:
+					oldData = key.data
+				else:
+					oldData = copy.deepcopy(profileSkeleton)
+					oldData['identity']['key'] = request.matchdict['user']
+				key.data = util.mergeObjects(oldData, data)
 			except:
 				return Response(status=500, body='Failed to merge objects')
 
