@@ -1,9 +1,9 @@
-#
-# Handle learner profile requests
-#
+'''
+profile.py - Process direct learner profile requests
+'''
 
 from pyramid.response import Response
-import util, json, riak, copy
+import util, riak, copy
 import hashlib, base64
 
 client = riak.RiakClient(pb_port=8087, protocol='pbc')
