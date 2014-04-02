@@ -18,15 +18,25 @@
 
 			$(document).ready(function()
 			{
+				var lastTag = undefined;
+
 				$('#pull').click(function(){
 					var id = $('#serverId').val();
 					$.ajax({
 						'url': '/profile?id='+id,
 						'type': 'GET',
 						'dataType': 'json',
-						'success': function(data,status,xhr){
-							console.log('Pull successful');
-							$('#body').val(JSON.stringify(data,null,'    '));
+						'headers': {
+							'If-None-Match': lastTag
+						},
+						'statusCode': {
+							200: function(data,status,xhr){
+								console.log('Pull successful');
+								if(xhr.status == 200){
+									$('#body').val(JSON.stringify(data,null,'    '));
+									lastTag = xhr.getResponseHeader('ETag');
+								}
+							}
 						},
 						'error': function(xhr,status,err){
 							console.log('Pull failed');
@@ -44,6 +54,9 @@
 						'contentType': 'application/json',
 						'data': body,
 						'processData': false,
+						'headers': {
+							'If-Match': lastTag
+						},
 						'success': function(data,status,xhr){
 							console.log('Push successful');
 							$('#body').val(JSON.stringify(data,null,'    '));
@@ -60,6 +73,9 @@
 					$.ajax({
 						'url': '/profile?id='+id,
 						'type': 'DELETE',
+						'headers': {
+							'If-Match': lastTag
+						},
 						'success': function(data,status,xhr){
 							console.log('Delete successful');
 							$('#body').val('');
@@ -79,9 +95,9 @@
 		<label>Identifier: 
 			<input type="text" id="serverId"></input>
 		</label>
-		<input type="button" id="pull" value="Pull"/>
-		<input type="button" id="push" value="Push"/>
-		<input type="button" id="delete" value="Delete"/>
+		<input type="button" id="pull" value="GET"/>
+		<input type="button" id="push" value="POST"/>
+		<input type="button" id="delete" value="DELETE"/>
 		<textarea id="body" placeholder="Profile body goes here"></textarea>
 
 	</body>

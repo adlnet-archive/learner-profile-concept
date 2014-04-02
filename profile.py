@@ -19,12 +19,15 @@ def getProfile(request):
 
 	if key.exists:
 
-		res.md5_etag( json.dumps(key.data, sort_keys=True) )
+		hash = hashlib.md5( json.dumps(key.data, sort_keys=True) ).digest()
+		hash = base64.b64encode(hash).strip('=')
+		if_none_match = request.headers['If-None-Match'] if 'If-None-Match' in request.headers.keys() else None
 
-		if request.if_none_match == res.etag:
+		if if_none_match in ['*', hash]:
 			res.status = 304
 		else:
 			res.status = 200
+			res.headers['ETag'] = hash
 			if request.method == 'GET':
 				res.json = key.data
 
@@ -52,14 +55,14 @@ def saveProfile(request):
 		oldHash = hashlib.md5( json.dumps(key.data, sort_keys=True) ).digest()
 		oldHash = base64.b64encode(oldHash).strip('=')
 	else:
-		oldHash = None
+		# hash of empty string
+		oldHash = '1B2M2Y8AsgTpgAmY7PhCfg'
 
-	#print 'If "{!r}", If not "{!r}"'.format(request.if_match, request.if_none_match)
-	#print type(request.if_match)
-	#matcher = etag.ETagMatcher([oldHash])
+	if_match = request.headers['If-Match'] if 'If-Match' in request.headers.keys() else '*'
+	if_none_match = request.headers['If-None-Match'] if 'If-None-Match' in request.headers.keys() else None
 
 	# if the preconditions pass
-	if request.if_match in [etag.AnyETag, oldHash] and request.if_none_match not in [etag.NoETag, oldHash]:
+	if if_match in ['*', oldHash] and if_none_match not in ['*', oldHash]:
 
 		# merge objects on POST
 		if request.method == 'POST':
@@ -75,10 +78,10 @@ def saveProfile(request):
 		key.store()
 
 		# indicate creation or update
-		if added:
-			return Response(status=201, json=key.data)
-		else:
-			return Response(status=200, json=key.data)
+		res = Response(json=key.data)
+		res.md5_etag( json.dumps(key.data,sort_keys=True) )
+		res.status = 201 if added else 200
+		return res
 
 	# if the precondition fails, return 412
 	else:
@@ -89,8 +92,26 @@ def deleteProfile(request):
 	'''If authorized, delete given learner profile'''
 
 	key = db.get(request.params['id'])
+
+	# compute original hash for update comparison
 	if key.exists:
-		key.delete()
-		return Response(status=204)
+		oldHash = hashlib.md5( json.dumps(key.data, sort_keys=True) ).digest()
+		oldHash = base64.b64encode(oldHash).strip('=')
 	else:
-		return Response(status=404)
+		# hash of empty string
+		oldHash = '1B2M2Y8AsgTpgAmY7PhCfg'
+
+	if_match = request.headers['If-Match'] if 'If-Match' in request.headers.keys() else '*'
+	if_none_match = request.headers['If-None-Match'] if 'If-None-Match' in request.headers.keys() else None
+
+	# check preconditions
+	if if_match in ['*',oldHash] and if_none_match not in ['*',oldHash]:
+		if key.exists:
+			key.delete()
+			return Response(status=204)
+		else:
+			return Response(status=404)
+
+	# precondition failed
+	else:
+		return Response(status=412)
