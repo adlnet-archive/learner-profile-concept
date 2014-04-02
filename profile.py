@@ -39,6 +39,7 @@ def getProfile(request):
 			res.headers['ETag'] = hash
 			if request.method == 'GET':
 				res.json = key.data
+				res.content_type = 'application/json'
 
 	else:
 		res.status = 404
