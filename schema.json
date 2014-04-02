@@ -1,0 +1,48 @@
+{
+"$schema": "http://json-schema.org/draft-04/schema#",
+"type": "object",
+"required": ["identity"],
+"properties": {
+
+	"identity": {
+	"type": "object",
+	"required": ["key"],
+	"properties": {
+		"key": {
+			"type": "string"
+		},
+		"mbox": {
+			"type": "string",
+			"pattern": "^mailto:[A-Za-z0-9\._-]+@(?:[A-Za-z0-9_-]+\.)+\.[A-Za-z]{2,4}$"
+		}
+		"mbox_sha1sum": {
+			"type": "string",
+			"pattern": "^[0-9A-Fa-f]{20}$"
+		},
+		"name": {
+		"type": "object",
+		"properties": {
+			"title": {"type":"string"},
+			"givenName": {"type":"string"},
+			"familyName": {"type":"string"},
+			"suffix": {"type":"string"},
+			"nickname": {"type":"string"}
+		}
+		},
+		"socialProfiles": {
+		"type": "array",
+		"items": {
+			"type": "string"
+		}
+		}
+	}
+	},
+
+	"badges": {
+	"type": "array",
+	"items": {
+		"type": "object"
+	}
+	}
+}
+}
