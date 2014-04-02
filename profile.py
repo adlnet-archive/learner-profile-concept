@@ -14,13 +14,12 @@ db = client.bucket('profiles')
 def getProfile(request):
 	'''If authorized, respond with learner profile from db'''
 
-	key = db.get(request.params['id'])
+	key = db.get(request.matchdict['user'])
 	res = Response()
 
 	if key.exists:
 
-		hash = hashlib.md5( json.dumps(key.data, sort_keys=True) ).digest()
-		hash = base64.b64encode(hash).strip('=')
+		hash = util.genETag(key.data)
 		if_none_match = request.headers['If-None-Match'] if 'If-None-Match' in request.headers.keys() else None
 
 		if if_none_match in ['*', hash]:
@@ -40,7 +39,7 @@ def getProfile(request):
 def saveProfile(request):
 	'''If authorized, update learner profile with request body'''
 
-	key = db.get(request.params['id'])
+	key = db.get(request.matchdict['user'])
 	added = not key.exists
 	data = None
 
@@ -52,8 +51,7 @@ def saveProfile(request):
 
 	# compute original hash for update comparison
 	if key.exists:
-		oldHash = hashlib.md5( json.dumps(key.data, sort_keys=True) ).digest()
-		oldHash = base64.b64encode(oldHash).strip('=')
+		oldHash = util.genETag(key.data)
 	else:
 		# hash of empty string
 		oldHash = '1B2M2Y8AsgTpgAmY7PhCfg'
@@ -79,7 +77,7 @@ def saveProfile(request):
 
 		# indicate creation or update
 		res = Response(json=key.data)
-		res.md5_etag( json.dumps(key.data,sort_keys=True) )
+		res.headers['ETag'] = util.genETag(key.data)
 		res.status = 201 if added else 200
 		return res
 
@@ -91,12 +89,11 @@ def saveProfile(request):
 def deleteProfile(request):
 	'''If authorized, delete given learner profile'''
 
-	key = db.get(request.params['id'])
+	key = db.get(request.matchdict['user'])
 
 	# compute original hash for update comparison
 	if key.exists:
-		oldHash = hashlib.md5( json.dumps(key.data, sort_keys=True) ).digest()
-		oldHash = base64.b64encode(oldHash).strip('=')
+		oldHash = util.genETag(key.data)
 	else:
 		# hash of empty string
 		oldHash = '1B2M2Y8AsgTpgAmY7PhCfg'

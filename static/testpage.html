@@ -23,7 +23,7 @@
 				$('#pull').click(function(){
 					var id = $('#serverId').val();
 					$.ajax({
-						'url': '/profile?id='+id,
+						'url': '/learner/'+id,
 						'type': 'GET',
 						'dataType': 'json',
 						'headers': {
@@ -49,7 +49,7 @@
 					var id = $('#serverId').val();
 					var body = $('#body').val();
 					$.ajax({
-						'url': '/profile?id='+id,
+						'url': '/learner/'+id,
 						'type': 'POST',
 						'contentType': 'application/json',
 						'data': body,
@@ -59,6 +59,7 @@
 						},
 						'success': function(data,status,xhr){
 							console.log('Push successful');
+							lastTag = xhr.getResponseHeader('ETag');
 							$('#body').val(JSON.stringify(data,null,'    '));
 						},
 						'error': function(xhr,status,err){
@@ -71,7 +72,7 @@
 				$('#delete').click(function(){
 					var id = $('#serverId').val();
 					$.ajax({
-						'url': '/profile?id='+id,
+						'url': '/learner/'+id,
 						'type': 'DELETE',
 						'headers': {
 							'If-Match': lastTag

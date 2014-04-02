@@ -11,9 +11,9 @@ def main(args):
 
 	config = Configurator()
 
-	config.add_route('getProfile', '/profile', request_method=('GET','HEAD'), request_param='id')
-	config.add_route('saveProfile', '/profile', request_method=('POST','PUT'), request_param='id')
-	config.add_route('deleteProfile', '/profile', request_method='DELETE', request_param='id')
+	config.add_route('getProfile', pattern='/learner/{user}', request_method=('GET','HEAD'))
+	config.add_route('saveProfile', pattern='/learner/{user}', request_method=('POST','PUT'))
+	config.add_route('deleteProfile', pattern='/learner/{user}', request_method='DELETE')
 
 	config.add_view(profile.getProfile, route_name='getProfile')
 	config.add_view(profile.saveProfile, route_name='saveProfile')
