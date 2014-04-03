@@ -48,27 +48,84 @@ $ source env/bin/activate
 
 ## Usage
 
-This is a very simple API. It exposes a single root endpoint `/learner/{user}` that sends and receives
-JSON documents, where {user} is some unique identifier. It also exposes several sub-endpoints to access
-particular parts of the JSON document.
+This is a very simple API. It exposes two endpoints: `/api/learner` for creating new learner profiles, and `/api/learner/{uid}`
+that sends and receives JSON documents, where {uid} is an identifier chosen during account creation. The API also exposes
+several sub-endpoints to access particular parts of the JSON document.
 
 
-### Example Body
+### POST /api/learner
+Create a new learner. Expects a JSON document specifying at least a unique identifier for this user.
 
-This is an example of the types of data that could be stored in this implementation of the Learner Profile.
+#### Arguments
+*None*
+
+#### Returns
+
+__201 Created__ (JSON)  
+Returns the newly created learner profile. It will likely look something like this:
+
+```javascript
+{
+	"identity": {
+		"uid": "username"
+	},
+	"badges": {
+		"desired": [],
+		"inProgress": [],
+		"achieved": []
+	}
+}
+```
+
+__400 Bad Request__ (no body)  
+The request body is not a valid JSON body, or does not contain the required *uid* field.
+
+__409 Conflict__ (no body)  
+The supplied *uid* is already in use by another learner profile. Try again with a different identifier.
+
+#### Example Minimal Request Body
+
+```javascript
+{
+	"identity": {
+		"uid": "username"
+	}
+}
+```
+
+
+### GET /api/learner/{uid}
+
+Use this method to retrieve the document stored with the given {uid}. Supports the `ETag` and `If-None-Match` headers for
+concurrency control.
+
+#### Arguments
+*None*
+
+#### Returns
+
+__200 OK__ (JSON)  
+Returns the previously stored document with that user ID.
+
+__304 Not Modified__ (no body)  
+If the _If-None-Match_ header is provided and matches the version on the server.
+
+__404 Not Found__ (no body)  
+There are no documents associated with that identifier.
+
+#### Sample Response Body
 
 ```javascript
 {
 	// store personal information here
 	"identity": {
 	
-		// The ID used in the URL. Auto-populated, immutable, required
-		"key": "username",
+		// the ID used in the URL, as supplied during account creation. immutable.
+		"uid": "username",
 		
 		// additional optional information about the learner
 		"givenName": "Joe",      
 		"familyName": "Learner",
-		"educationLevel": 5,
 		
 		// should store Experience API-style agent identifiers
 		"mbox": "mailto:joe.learner@example.com" 
@@ -89,33 +146,14 @@ This is an example of the types of data that could be stored in this implementat
 }
 ```
 
-
-### HEAD,GET /learner/{user}
-
-Use these methods to retrieve the document stored for {user}. Supports the `ETag` and `If-None-Match` headers for concurrency
-control. The only difference between these two methods is that `HEAD` will not return an actual document, but will still
-return the document's ETag. Useful as a cheap way of checking for server-side changes.
-
-#### Arguments
-*None*
-
-#### Returns
-
-__200 OK__ (JSON with `GET`, no body with `HEAD`)  
-Returns the previously stored document with that user ID.
-
-__304 Not Modified__ (no body)  
-If the _If-None-Match_ header is provided and matches the version on the server.
-
-__404 Not Found__ (no body)  
-There are no documents associated with that identifier.
+### HEAD /api/learner/{uid}
+Same as `GET`, with the exception that it will not return an actual document, but will still return the document's ETag.
+Useful as a cheap way of checking for server-side changes.
 
 
-### PUT,POST /learner/{user}
-
-Set or update a learner's profile. A `PUT` request will attempt to merge the posted document with the current content of the
-learner profile, whereas a `POST` will simply replace it. Supports the `ETag`, `If-Match`, and `If-None-Match` headers for
-concurrency control.
+### PUT /api/learner/{uid}
+Update a learner's profile. Will attempt to merge the posted document with the current content of the learner profile.
+Supports the `ETag`, `If-Match`, and `If-None-Match` headers for concurrency control.
 
 #### Arguments
 *None*
@@ -123,10 +161,7 @@ concurrency control.
 #### Returns
 
 __200 OK__ (JSON)  
-Returns the newly-updated complete document.
-
-__201 Created__ (JSON)  
-Returns the newly-created complete document.
+Returns the newly-updated complete document, as if you followed the update with a `GET`.
 
 __400 Bad Request__ (no body)  
 The posted body does not form a valid JSON document.
@@ -135,10 +170,30 @@ __412 Precondition Failed__ (no body)
 The server-side content does not match an `If-Match` condition, or does match an `If-None-Match`. No changes are made.
 
 __500 Internal Server Error__ (no body)  
-For `PUT` only. Attempt to merge old and new documents failed.
+Attempt to merge old and new documents failed.
 
 
-### DELETE /learner/{user}
+### POST /api/learner/{uid}
+
+Set a learner's profile, destroying any previous content. Will not destroy the `key` field however. Supports the `ETag`,
+`If-Match`, and `If-None-Match` headers for concurrency control.
+
+#### Arguments
+*None*
+
+#### Returns
+
+__200 OK__ (JSON)  
+Returns the newly-updated complete document, as if you followed the update with a `GET`.
+
+__400 Bad Request__ (no body)  
+The posted body does not form a valid JSON document.
+
+__412 Precondition Failed__ (no body)  
+The server-side content does not match an `If-Match` condition, or does match an `If-None-Match`. No changes are made.
+
+
+### DELETE /api/learner/{uid}
 
 Removes any stored learner profile for this user. Any subsequent `GET`s will return 404. Supports the `If-Match` and
 `If-None-Match` headers for concurrency control.
