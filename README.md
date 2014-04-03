@@ -146,6 +146,164 @@ There are no documents associated with that identifier.
 }
 ```
 
+### GET /api/learner/{uid}/badges
+
+Use this method to retrieve the badges stored with the given {uid}. Supports the `ETag` and `If-None-Match` headers for concurrency control.
+
+#### Arguments
+*None*
+
+#### Returns
+
+__200 OK__ (JSON)  
+Returns the user's badges.
+
+__304 Not Modified__ (no body)  
+If the _If-None-Match_ header is provided and matches the version on the server.
+
+__404 Not Found__ (no body)  
+There are no documents associated with that identifier.
+
+#### Sample Response Body
+
+```javascript
+{
+	// the learner's competency history and goals
+	"badges": {
+		
+		// badges the learner would like to have
+		"desired": [badge1, badge2],
+		
+		// badges the learner is currently working toward
+		"inProgress": [badge1],
+		
+		// badges the learner has already acquired
+		"achieved": [badgeAssertion1, badgeAssertion2]
+	}
+}
+```
+
+### GET /api/learner/{uid}/badges/achieved
+
+Use this method to retrieve the achieved badges stored with the given {uid}. Supports the `ETag` and `If-None-Match` headers for concurrency control.
+
+#### Arguments
+*None*
+
+#### Returns
+
+__200 OK__ (JSON)  
+Returns the user's badges.
+
+__304 Not Modified__ (no body)  
+If the _If-None-Match_ header is provided and matches the version on the server.
+
+__404 Not Found__ (no body)  
+There are no documents associated with that identifier.
+
+#### Sample Response Body
+
+```javascript
+{
+	// badges the learner has already acquired
+	"achieved": [badgeAssertion1, badgeAssertion2]
+}
+```
+
+### GET /api/learner/{uid}/badges/achieved/{assertionid}
+
+Use this method to retrieve a user's [badge assertion](https://github.com/mozilla/openbadges-specification/blob/master/Assertion/latest.md). Supports the `ETag` and `If-None-Match` headers for concurrency control.
+
+#### Arguments
+*None*
+
+#### Returns
+
+__200 OK__ (JSON)  
+Returns the user's badges.
+
+__304 Not Modified__ (no body)  
+If the _If-None-Match_ header is provided and matches the version on the server.
+
+__404 Not Found__ (no body)  
+There are no documents associated with that identifier.
+
+#### Sample Response Body
+
+```javascript
+{
+    "uid": "joelearner",
+    "recipient": {
+        "type": "email",
+        "hashed": true,
+        "salt": "deadsea",
+        "identity": 
+    "sha256$c7ef86405ba71b85acd8e2e95166c4b111448089f2e1599f42fe1bba46e865c5"
+    },
+    "issuedOn": 1359217910,
+    "badge": "https://example.org/robotics-badge.json",
+    "verify": {
+        "type": "hosted",
+        "url": "https://example.org/beths-robotics-badge.json"
+    }
+}
+```
+
+### GET /api/learner/{uid}/badges/inprogress
+
+Use this method to retrieve the badges the given {uid} is working on achieving. Supports the `ETag` and `If-None-Match` headers for concurrency control.
+
+#### Arguments
+*None*
+
+#### Returns
+
+__200 OK__ (JSON)  
+Returns the user's badges.
+
+__304 Not Modified__ (no body)  
+If the _If-None-Match_ header is provided and matches the version on the server.
+
+__404 Not Found__ (no body)  
+There are no documents associated with that identifier.
+
+#### Sample Response Body
+
+```javascript
+{
+	// badges the learner has already acquired
+	"inProgress": [badgeAssertion1, badgeAssertion2]
+}
+```
+
+### GET /api/learner/{uid}/badges/desired
+
+Use this method to retrieve the badges the given {uid} desires to achieve. Supports the `ETag` and `If-None-Match` headers for concurrency control.
+
+#### Arguments
+*None*
+
+#### Returns
+
+__200 OK__ (JSON)  
+Returns the user's badges.
+
+__304 Not Modified__ (no body)  
+If the _If-None-Match_ header is provided and matches the version on the server.
+
+__404 Not Found__ (no body)  
+There are no documents associated with that identifier.
+
+#### Sample Response Body
+
+```javascript
+{
+	// badges the learner has already acquired
+	"desired": [badgeAssertion1, badgeAssertion2]
+}
+```
+
+
 ### HEAD /api/learner/{uid}
 Same as `GET`, with the exception that it will not return an actual document, but will still return the document's ETag.
 Useful as a cheap way of checking for server-side changes.
