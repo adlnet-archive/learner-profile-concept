@@ -41,7 +41,10 @@ def createProfile(request):
 	key = db.new(uid, data=data)
 	key.store()
 
-	return Response(status=201, json=data)
+	res = Response(status=201, json=data)
+	res.headers['ETag'] = util.genETag(data)
+
+	return res
 
 
 def getProfile(request):

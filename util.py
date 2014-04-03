@@ -30,7 +30,7 @@ def mergeObjects(old, new, protectUid=False, mergeDepth=0):
 	except (TypeError, AttributeError):
 
 		# protect identity.uid
-		if protectUid and mergeDepth == 3:
+		if protectUid and mergeDepth == 2:
 			return old
 		else:
 			return new
