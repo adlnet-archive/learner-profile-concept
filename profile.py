@@ -11,7 +11,7 @@ db = client.bucket('profiles')
 
 profileSkeleton = {
 	'identity': {
-		'uid': None
+		'userid': None
 	},
 	'badges': {
 		'desired': [],
@@ -26,11 +26,11 @@ def createProfile(request):
 	# get proposed key
 	uid = None
 	try:
-		uid = request.json['identity']['uid']
+		uid = request.json['identity']['userid']
 	except ValueError:
 		return Response(status=400, body='Body is not JSON')
 	except KeyError:
-		return Response(status=400, body='Body does not include required field "identity.uid"')
+		return Response(status=400, body='Body does not include required field "identity.userid"')
 
 	if db.get(uid).exists:
 		return Response(status=409)
@@ -106,7 +106,7 @@ def saveProfile(request):
 		# replace object on POST
 		else:
 			template = copy.deepcopy(profileSkeleton)
-			template['identity']['uid'] = request.matchdict['user']
+			template['identity']['userid'] = request.matchdict['user']
 			key.data = util.mergeObjects(template, data, protectUid=True)
 
 		key.store()

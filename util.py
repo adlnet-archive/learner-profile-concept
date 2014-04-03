@@ -12,7 +12,7 @@ def mergeObjects(old, new, protectUid=False, mergeDepth=0):
 		for key in new.keys():
 			try:
 				# key is already in old, update
-				critPath = protectUid and mergeDepth < 2 and key == ['identity','uid'][mergeDepth]
+				critPath = protectUid and mergeDepth < 2 and key == ['identity','userid'][mergeDepth]
 				mergedval = mergeObjects(old[key], new[key], protectUid=critPath, mergeDepth=mergeDepth+1)
 
 				if mergedval != None:
@@ -22,9 +22,9 @@ def mergeObjects(old, new, protectUid=False, mergeDepth=0):
 				elif not critPath:
 					del old[key]
 
-				# if they try to, delete everything but the uid
+				# if they try to, delete everything but the userid
 				else:
-					old[key] = {'uid': old[key]['uid']}
+					old[key] = {'userid': old[key]['userid']}
 
 			except KeyError:
 				# key is not in old, create
@@ -35,7 +35,7 @@ def mergeObjects(old, new, protectUid=False, mergeDepth=0):
 	# new and old are not mergable, so new is the updated value
 	except (TypeError, AttributeError):
 
-		# protect identity.uid
+		# protect identity.userid
 		if protectUid and mergeDepth == 2:
 			return old
 		else:
