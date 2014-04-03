@@ -12,16 +12,19 @@ def main(args):
 	config = Configurator()
 
 	# configure full profile editing
-	config.add_route('getProfile', pattern='/learner/{user}', request_method=('GET','HEAD'))
+	config.add_route('createProfile', pattern='/api/learner', request_method='POST')
+	config.add_view(profile.createProfile, route_name='createProfile')
+
+	config.add_route('getProfile', pattern='/api/learner/{user}', request_method=('GET','HEAD'))
 	config.add_view(profile.getProfile, route_name='getProfile')
-	config.add_route('saveProfile', pattern='/learner/{user}', request_method=('POST','PUT'))
+	config.add_route('saveProfile', pattern='/api/learner/{user}', request_method=('POST','PUT'))
 	config.add_view(profile.saveProfile, route_name='saveProfile')
-	config.add_route('deleteProfile', pattern='/learner/{user}', request_method='DELETE')
+	config.add_route('deleteProfile', pattern='/api/learner/{user}', request_method='DELETE')
 	config.add_view(profile.deleteProfile, route_name='deleteProfile')
 
 	# configure badge views
-	config.add_route('getBadges', pattern='/learner/{user}/badges', request_method=('GET','HEAD'))
-	config.add_route('getBadgeType', pattern='/learner/{user}/badges/{type}', request_method=('GET','HEAD'))
+	config.add_route('getBadges', pattern='/api/learner/{user}/badges', request_method=('GET','HEAD'))
+	config.add_route('getBadgeType', pattern='/api/learner/{user}/badges/{type}', request_method=('GET','HEAD'))
 	config.add_view(badges.getBadges, route_name='getBadges')
 	config.add_view(badges.getBadges, route_name='getBadgeType')
 

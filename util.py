@@ -4,7 +4,7 @@ Miscellaneous functions
 
 import hashlib, base64, json
 
-def mergeObjects(old, new):
+def mergeObjects(old, new, protectUid=False, mergeDepth=0):
 	'''Update old object with data from new object'''
 
 	# new and old are mergable
@@ -12,7 +12,9 @@ def mergeObjects(old, new):
 		for key in new.keys():
 			try:
 				# key is already in old, update
-				mergedval = mergeObjects(old[key], new[key])
+				critPath = protectUid and mergeDepth < 2 and key == ['identity','uid'][mergeDepth]
+				mergedval = mergeObjects(old[key], new[key], protectUid=critPath, mergeDepth=mergeDepth+1)
+
 				if mergedval != None:
 					old[key] = mergedval
 				else:
@@ -26,7 +28,12 @@ def mergeObjects(old, new):
 
 	# new and old are not mergable, so new is the updated value
 	except (TypeError, AttributeError):
-		return new
+
+		# protect identity.uid
+		if protectUid and mergeDepth == 3:
+			return old
+		else:
+			return new
 
 
 def genETag(obj):

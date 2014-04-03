@@ -189,6 +189,9 @@ Returns the newly-updated complete document, as if you followed the update with 
 __400 Bad Request__ (no body)  
 The posted body does not form a valid JSON document.
 
+__404 Not Found__ (no body)  
+There is no learner with the given *uid*.
+
 __412 Precondition Failed__ (no body)  
 The server-side content does not match an `If-Match` condition, or does match an `If-None-Match`. No changes are made.
 
@@ -204,10 +207,10 @@ Removes any stored learner profile for this user. Any subsequent `GET`s will ret
 #### Returns
 
 __204 No Content__ (no body)  
-The document has been deleted successfully.
+The profile has been deleted successfully.
 
 __404 Not Found__ (no body)  
-There is no database entry for the provided username.
+There is learner with the given *uid*.
 
 __412 Precondition Failed__ (no body)  
 The server-side content does not match an `If-Match` condition, or does match an `If-None-Match`. No changes are made.

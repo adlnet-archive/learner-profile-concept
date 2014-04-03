@@ -11,7 +11,7 @@ db = client.bucket('profiles')
 
 profileSkeleton = {
 	'identity': {
-		'key': None
+		'uid': None
 	},
 	'badges': {
 		'desired': [],
@@ -19,6 +19,29 @@ profileSkeleton = {
 		'achieved': []
 	}
 }
+
+def createProfile(request):
+	'''Create a new learner profile'''
+
+	# get proposed key
+	uid = None
+	try:
+		uid = request.json['identity']['uid']
+	except ValueError:
+		return Response(status=400, body='Body is not JSON')
+	except KeyError:
+		return Response(status=400, body='Body does not include required field "identity.uid"')
+
+	if db.get(uid).exists:
+		return Response(status=409)
+	
+	# create stub profile
+	template = copy.deepcopy(profileSkeleton)
+	data = util.mergeObjects(template, request.json, protectUid=False)
+	key = db.new(uid, data=data)
+	key.store()
+
+	return Response(status=201, json=data)
 
 
 def getProfile(request):
@@ -51,7 +74,6 @@ def saveProfile(request):
 	'''If authorized, update learner profile with request body'''
 
 	key = db.get(request.matchdict['user'])
-	added = not key.exists
 	data = None
 
 	# get the post data, if available
@@ -60,13 +82,11 @@ def saveProfile(request):
 	except ValueError:
 		return Response(status=400, body='Body is not JSON')	
 
-	# compute original hash for update comparison
-	if key.exists:
-		oldHash = util.genETag(key.data)
-	else:
-		# hash of empty string
-		oldHash = '1B2M2Y8AsgTpgAmY7PhCfg'
+	if not key.exists:
+		return Response(status=404)
 
+	# compute original hash for update comparison
+	oldHash = util.genETag(key.data)
 	if_match = request.headers['If-Match'] if 'If-Match' in request.headers.keys() else '*'
 	if_none_match = request.headers['If-None-Match'] if 'If-None-Match' in request.headers.keys() else None
 
@@ -76,25 +96,22 @@ def saveProfile(request):
 		# merge objects on PUT
 		if request.method == 'PUT':
 			try:
-				if key.exists:
-					oldData = key.data
-				else:
-					oldData = copy.deepcopy(profileSkeleton)
-					oldData['identity']['key'] = request.matchdict['user']
-				key.data = util.mergeObjects(oldData, data)
+				key.data = util.mergeObjects(key.data, data, protectUid=True)
 			except:
 				return Response(status=500, body='Failed to merge objects')
 
 		# replace object on POST
 		else:
-			key.data = data
+			template = copy.deepcopy(profileSkeleton)
+			template['identity']['uid'] = request.matchdict['user']
+			key.data = util.mergeObjects(template, data, protectUid=True)
 
 		key.store()
 
 		# indicate creation or update
 		res = Response(json=key.data)
 		res.headers['ETag'] = util.genETag(key.data)
-		res.status = 201 if added else 200
+		res.status = 200
 		return res
 
 	# if the precondition fails, return 412
@@ -107,23 +124,18 @@ def deleteProfile(request):
 
 	key = db.get(request.matchdict['user'])
 
-	# compute original hash for update comparison
-	if key.exists:
-		oldHash = util.genETag(key.data)
-	else:
-		# hash of empty string
-		oldHash = '1B2M2Y8AsgTpgAmY7PhCfg'
+	if not key.exists:
+		return Response(status=404)
 
+	# compute original hash for update comparison
+	oldHash = util.genETag(key.data)
 	if_match = request.headers['If-Match'] if 'If-Match' in request.headers.keys() else '*'
 	if_none_match = request.headers['If-None-Match'] if 'If-None-Match' in request.headers.keys() else None
 
 	# check preconditions
 	if if_match in ['*',oldHash] and if_none_match not in ['*',oldHash]:
-		if key.exists:
-			key.delete()
-			return Response(status=204)
-		else:
-			return Response(status=404)
+		key.delete()
+		return Response(status=204)
 
 	# precondition failed
 	else:
