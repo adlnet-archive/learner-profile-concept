@@ -17,8 +17,14 @@ def mergeObjects(old, new, protectUid=False, mergeDepth=0):
 
 				if mergedval != None:
 					old[key] = mergedval
-				else:
+
+				# don't let the user delete the identity block
+				elif not critPath:
 					del old[key]
+
+				# if they try to, delete everything but the uid
+				else:
+					old[key] = {'uid': old[key]['uid']}
 
 			except KeyError:
 				# key is not in old, create
