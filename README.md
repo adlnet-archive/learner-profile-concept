@@ -29,6 +29,7 @@ instructions.
 ```bash
 $ git clone https://github.com/adlnet/learner-profile-concept.git
 $ cd learner-profile-concept
+$ pip install virtualenv
 $ virtualenv env
 $ source env/bin/activate
 (env)$ pip install -r requirements.txt
