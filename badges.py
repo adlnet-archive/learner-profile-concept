@@ -25,19 +25,22 @@ def getBadges(req):
 				res.json = {'badges': key.data['badges']}
 
 		elif req.matchdict['type'] == 'achieved':
-			res.headers['ETag'] = util.genETag(key.data['badges']['achieved'])
+			body = {'achieved': key.data['badges']['achieved']}
+			res.headers['ETag'] = util.genETag(body)
 			if req.method == 'GET':
-				res.json = {'achieved': key.data['badges']['achieved']}
+				res.json = body
 
 		elif req.matchdict['type'] == 'inprogress':
-			res.headers['ETag'] = util.genETag(key.data['badges']['inProgress'])
+			body = {'inProgress': key.data['badges']['inProgress']}
+			res.headers['ETag'] = util.genETag(body)
 			if req.method == 'GET':
-				res.json = {'inProgress': key.data['badges']['inProgress']}
+				res.json = body
 
 		elif req.matchdict['type'] == 'desired':
-			res.headers['ETag'] = util.genETag(key.data['badges']['desired'])
+			body = {'desired': key.data['badges']['desired']}
+			res.headers['ETag'] = util.genETag(body)
 			if req.method == 'GET':
-				res.json = {'desired': key.data['badges']['desired']}
+				res.json = body
 
 		else:
 			res.status = 404
