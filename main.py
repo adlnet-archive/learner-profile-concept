@@ -29,6 +29,9 @@ def main(args):
 	config.add_view(badges.getBadges, route_name='getBadges')
 	config.add_view(badges.getBadges, route_name='getBadgesOfType')
 
+	config.add_route('setBadges', pattern='/api/learner/{user}/badges/{type}', request_method=('PUT','POST'))
+	config.add_view(badges.addBadges, route_name='setBadges')
+
 	config.add_static_view('static', 'static/')
 
 	app = config.make_wsgi_app()
